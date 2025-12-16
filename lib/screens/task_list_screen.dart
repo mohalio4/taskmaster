@@ -13,6 +13,7 @@ class TaskListScreen extends StatefulWidget {
 class _TaskListScreenState extends State<TaskListScreen> {
   final repo = TaskRepository();
   List<Task> tasks = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -21,15 +22,18 @@ class _TaskListScreenState extends State<TaskListScreen> {
   }
 
   Future<void> loadTasks() async {
-    tasks = await repo.getAllTasks();
-    setState(() {});
+    setState(() => isLoading = true);
+    tasks = await repo.getTasks(); // Fixed: was getAllTasks()
+    setState(() => isLoading = false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("My Tasks")),
-      body: tasks.isEmpty
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : tasks.isEmpty
           ? const Center(child: Text("No tasks found"))
           : ListView.builder(
         padding: const EdgeInsets.all(16),
